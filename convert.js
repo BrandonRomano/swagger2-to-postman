@@ -76,28 +76,15 @@ var uuid = require('node-uuid'),
             }
         },
 
-        getFolderNameForPath: function (pathUrl) {
-            if (pathUrl == '/') {
-                return null;
-            }
-            var segments = pathUrl.split('/'),
-                numSegments = segments.length,
-                folderName = null;
-            this.logger('Getting folder name for path: ' + pathUrl);
-            this.logger('Segments: ' + JSON.stringify(segments));
-            if (numSegments > 1) {
-                folderName = segments[1];
-
-                // create a folder for this path url
-                if (!this.folders[folderName]) {
-                    this.folders[folderName] = this.createNewFolder(folderName);
+        getFolderNameForPathObject: function (pathObject) {
+            for (var key in pathObject) {
+                if (pathObject.hasOwnProperty(key)) {
+                    var folderName = pathObject[key].tags[0]
+                    if (!this.folders[folderName]) {
+                        this.folders[folderName] = this.createNewFolder(folderName);
+                    }
+                    return this.folders[folderName].name;
                 }
-                this.logger('For path ' + pathUrl + ', returning folderName ' + this.folders[folderName].name);
-                return this.folders[folderName].name;
-            }
-            else {
-                this.logger('Error - path MUST begin with /');
-                return null;
             }
         },
 
@@ -329,10 +316,11 @@ var uuid = require('node-uuid'),
                 path,
                 folderName;
 
+
             // Add a folder for each path
             for (path in paths) {
                 if (paths.hasOwnProperty(path)) {
-                    folderName = this.getFolderNameForPath(path);
+                    folderName = this.getFolderNameForPathObject(paths[path])
                     this.logger('Adding path item. path = ' + path + '   folder = ' + folderName);
                     this.addPathItemToFolder(path, paths[path], folderName);
                 }
