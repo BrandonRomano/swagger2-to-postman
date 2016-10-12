@@ -155,6 +155,21 @@ var uuid = require('node-uuid'),
             return retVal;
         },
 
+        parseBodyData: function(swaggerParams) {
+          var resultObj = {}
+          for (var key in swaggerParams) {
+            if (swaggerParams.hasOwnProperty(key)) {
+              var property = swaggerParams[key]
+              if (property.type === 'object') {
+                resultObj[key] = this.parseBodyData(property.properties)
+              } else {
+                resultObj[key] = property.hasOwnProperty('x-example') ? property['x-example'] : '...'
+              }
+            }
+          }
+          return resultObj
+        },
+
         addOperationToFolder: function (path, method, operation, folderName, params) {
             var root = this,
                 request = {
@@ -165,7 +180,7 @@ var uuid = require('node-uuid'),
                     'preRequestScript': '',
                     'method': 'GET',
                     'data': [],
-                    'dataMode': 'params',
+                    'dataMode': 'raw',
                     'description': operation.description || '',
                     'descriptionFormat': 'html',
                     'time': '',
@@ -173,7 +188,8 @@ var uuid = require('node-uuid'),
                     'responses': [],
                     'tests': '',
                     'collectionId': root.collectionId,
-                    'synced': false
+                    'synced': false,
+                    'rawModeData': {}
                 },
                 thisParams = this.getParamsForPathItem(params, operation.parameters),
                 hasQueryParams = false,
@@ -242,6 +258,7 @@ var uuid = require('node-uuid'),
 
                     else if (thisParams[param].in === 'body') {
                         request.dataMode = 'raw';
+                        request.rawModeData = JSON.stringify(this.parseBodyData(thisParams[param].schema.properties), null, 2)
                         request.data = thisParams[param].description;
                     }
 
