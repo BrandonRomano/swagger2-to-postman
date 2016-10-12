@@ -221,6 +221,9 @@ var uuid = require('node-uuid'),
                 request.dataMode = 'urlencoded';
             }
 
+            // Set all requests content type
+            request.headers += 'Content-Type' + ': application/json\n';
+
             // set data and headers
             for (param in thisParams) {
                 if (thisParams.hasOwnProperty(param) && thisParams[param]) {
