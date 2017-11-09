@@ -240,8 +240,11 @@ var uuid = require('node-uuid'),
                         request.url += thisParams[param].name + '={{' + thisParams[param].name + '}}&';
                     }
 
-                    else if (thisParams[param].in === 'header') {
-                        request.headers += thisParams[param].name + ': {{' + thisParams[param].name + '}}\n';
+                    else if (thisParams[param].in === 'headers') {
+                        // We already add the content type above when reading the consumes parameter
+                        if (thisParams[param].name !== "Content-Type") {
+                            request.headers += thisParams[param].name + ': {{' + thisParams[param].name + '}}\n';
+                        }
                     }
 
                     else if (thisParams[param].in === 'body') {
