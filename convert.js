@@ -222,10 +222,11 @@ var uuid = require('node-uuid'),
             // eg. for GET requests
             if (thisConsumes.indexOf('application/x-www-form-urlencoded') > -1) {
                 request.dataMode = 'urlencoded';
+                request.headers += 'Content-Type' + ': application/x-www-form-urlencoded\n';
+            } else {
+                // Set all requests content type
+                request.headers += 'Content-Type' + ': application/json\n';
             }
-
-            // Set all requests content type
-            request.headers += 'Content-Type' + ': application/json\n';
 
             // set data and headers
             for (param in thisParams) {
